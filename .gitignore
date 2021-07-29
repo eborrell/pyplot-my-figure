@@ -1,0 +1,17 @@
+# pyenv version file
+.python-version
+
+# virtual environment
+venv/
+
+# egg info files
+*.egg-info
+
+# python compilation files
+*.pyc
+
+# state files
+*.swp
+
+# desktop service store
+.DS_Store
