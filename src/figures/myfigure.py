@@ -1,8 +1,8 @@
-import matplotlib
-import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+from matplotlib import rc
 
 import os
+
 
 PLOT_TYPES = [
     'linear',
@@ -26,6 +26,9 @@ class MyFigure(Figure):
         # add set of subplots
         _ = self.subplots()
 
+        # default plot type
+        self.plot_type = 'linear'
+
     @property
     def file_path(self):
         return os.path.join(self.dir_path, self.file_name + '.' + self.file_type)
@@ -37,13 +40,13 @@ class MyFigure(Figure):
         MEDIUM_SIZE = 20
         BIGGER_SIZE = 18
 
-        matplotlib.rc('font', size=SMALL_SIZE)
-        matplotlib.rc('axes', titlesize=SMALL_SIZE)
-        matplotlib.rc('axes', labelsize=MEDIUM_SIZE)
-        matplotlib.rc('xtick', labelsize=SMALL_SIZE)
-        matplotlib.rc('ytick', labelsize=SMALL_SIZE)
-        matplotlib.rc('legend', fontsize=SMALL_SIZE)
-        matplotlib.rc('figure', titlesize=BIGGER_SIZE)
+        rc('font', size=SMALL_SIZE)
+        rc('axes', titlesize=SMALL_SIZE)
+        rc('axes', labelsize=MEDIUM_SIZE)
+        rc('xtick', labelsize=SMALL_SIZE)
+        rc('ytick', labelsize=SMALL_SIZE)
+        rc('legend', fontsize=SMALL_SIZE)
+        rc('figure', titlesize=BIGGER_SIZE)
 
     def set_title(self, title):
         ax = self.axes[0]
@@ -106,3 +109,4 @@ class MyFigure(Figure):
 
         # save figure
         self.savefig(self.file_path)
+
