@@ -3,7 +3,6 @@ from matplotlib import rc
 
 import os
 
-
 PLOT_TYPES = [
     'linear',
     'semilogx',
@@ -26,10 +25,10 @@ LEGEND_LOCATION_STRINGS = [
 ]
 
 class MyFigure(Figure):
-    ''' Figure with one axes.
+    ''' customize figure with one axes.
     '''
 
-    def __init__(self, dir_path, file_name='foo', file_type='png', *args, **kwargs):
+    def __init__(self, dir_path=None, file_name='foo', file_type='png', *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # file path attributes
@@ -48,7 +47,10 @@ class MyFigure(Figure):
 
     @property
     def file_path(self):
-        return os.path.join(self.dir_path, self.file_name + '.' + self.file_type)
+        if self.dir_path is not None:
+            return os.path.join(self.dir_path, self.file_name + '.' + self.file_type)
+        else:
+            return None
 
     def set_font_sizes(self):
         #TODO! revise how **kwargs works
@@ -116,7 +118,8 @@ class MyFigure(Figure):
             ax.legend(loc=self.legend_loc, fontsize=8)
 
         # save figure
-        self.savefig(self.file_path)
+        if self.file_path is not None:
+            self.savefig(self.file_path)
 
     def plot_multiple_lines(self, x, y, colors=None, linestyles=None, labels=None):
         assert x.ndim == 1, ''
@@ -163,5 +166,6 @@ class MyFigure(Figure):
             ax.legend(loc=self.legend_loc, fontsize=8)
 
         # save figure
-        self.savefig(self.file_path)
+        if self.file_path is not None:
+            self.savefig(self.file_path)
 
