@@ -1,4 +1,4 @@
-# pyplot-custom-figure
+# pyplot-my-figure
 Custom figure subclass to pyplot figure
 
 ## Install
