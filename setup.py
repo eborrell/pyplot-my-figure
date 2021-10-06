@@ -9,14 +9,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="pyplot-custom-figure",
+    name="pyplot-my-figure",
     version=VERSION,
     description="custom figure subclass",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/eborrell/pyplot-custom-figure",
+    url="https://github.com/eborrell/pyplot-my-figure",
     project_urls={
-        "Bug Tracker": "https://github.com/eborrell/pyplot-custom-figure/issues",
+        "Bug Tracker": "https://github.com/eborrell/pyplot-my-figure/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3.9",
