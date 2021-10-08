@@ -31,26 +31,30 @@ make develop
 ```
 
 ## Examples
-shell
+
+1) import + define functions
 ```
 from figures.myfigure import MyFigure
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-# show plot, one line, linear
-fig = plt.figure(FigureClass=MyFigure)
-x = np.arange(100)
-y = x**2
-fig.plot_one_line(x, y)
-plt.show()
-
-# save plot, multiple lines, log scale for y axis
-fig = plt.figure(FigureClass=MyFigure, dir_path='foo', file_name='bar')
 x = np.arange(100)
 f = x**2
 g = x**3
+```
+
+2) show one line plot with linear scale
+```
+fig = plt.figure(FigureClass=MyFigure)
+fig.plot(x, f)
+plt.show()
+```
+
+3) save plot multiple lines plots with log scale for y axis
+```
+fig = plt.figure(FigureClass=MyFigure, dir_path='foo', file_name='bar')
 y = np.vstack((f, g))
 fig.set_plot_type('semilogx')
-fig.plot_multiple_lines(x, y)
+fig.plot(x, y)
 ```
