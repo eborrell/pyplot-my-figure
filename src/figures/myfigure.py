@@ -1,9 +1,11 @@
 from matplotlib.figure import Figure
-from matplotlib import rc
+from matplotlib import colors, cm, rc
+#from matplotlib import ticker, cm, colors
 import numpy as np
 
 import os
 
+#TODO: change name
 PLOT_TYPES = [
     'linear',
     'semilogx',
@@ -25,6 +27,13 @@ LEGEND_LOCATION_STRINGS = [
     'center',
 ]
 
+LEVELS_SCALE = [
+    'lineal',
+    'log2',
+    'log',
+    'log10',
+]
+
 class MyFigure(Figure):
     ''' customize figure with one axes.
     '''
@@ -38,13 +47,24 @@ class MyFigure(Figure):
         self.dir_path = dir_path
 
         # add set of subplots
-        _ = self.subplots()
+        self.ax = self.subplots()
 
         # default plot type
         self.plot_type = 'linear'
 
         # legend
         self.legend_loc = 'upper right'
+
+        # colormap
+        self.colormap = None
+
+        # levels scale
+        self.levels_scale = 'lineal'
+
+        # x and y lim changed flag
+        self.xlim_changed = False
+        self.ylim_changed = False
+
 
     @property
     def file_path(self):
@@ -69,24 +89,24 @@ class MyFigure(Figure):
         rc('figure', titlesize=BIGGER_SIZE)
 
     def set_title(self, title):
-        ax = self.axes[0]
-        ax.set_title(title)
+        self.ax.set_title(title)
 
     def set_xlabel(self, label):
-        ax = self.axes[0]
-        ax.set_xlabel(label)
+        self.ax.set_xlabel(label)
 
     def set_ylabel(self, label):
-        ax = self.axes[0]
-        ax.set_ylabel(label)
+        self.ax.set_ylabel(label)
 
     def set_xlim(self, xmin, xmax):
-        ax = self.axes[0]
-        ax.set_xlim(xmin, xmax)
+        self.ax.set_xlim(xmin, xmax)
+        self.xlim_changed = True
 
     def set_ylim(self, ymin, ymax):
-        ax = self.axes[0]
-        ax.set_ylim(ymin, ymax)
+        self.ax.set_ylim(ymin, ymax)
+        self.ylim_changed = True
+
+    def set_zlim(self, zmin, zmax):
+        self.ax.set_zlim(zmin, zmax)
 
     def set_legend_location(self, loc):
         assert loc in LEGEND_LOCATION_STRINGS, ''
@@ -96,6 +116,29 @@ class MyFigure(Figure):
     def set_plot_type(self, plot_type):
         assert plot_type in PLOT_TYPES, ''
         self.plot_type = plot_type
+
+    def set_colormap(self, colormap, start=0, stop=1, num=100):
+        assert 0 <= start <= stop <= 1, ''
+        colormap = cm.get_cmap(colormap, 100)
+        self.colormap = colors.ListedColormap(
+            colormap(np.linspace(start, stop, num))
+        )
+
+    def set_contour_levels_scale(self, scale='lineal'):
+        assert scale in LEVELS_SCALE, ''
+        self.levels_scale = scale
+
+    def get_contour_levels(self, n_levels=10):
+        if self.levels_scale == 'lineal':
+            levels = np.linspace(0, self.vmax, n_levels + 1)
+        elif self.levels_scale == 'log2':
+            levels = np.logspace(-1, np.log2(self.vmax), n_levels + 1, base=2)
+        elif self.levels_scale == 'log':
+            levels = np.logspace(-1, np.log(self.vmax), n_levels + 1, base=np.e)
+        elif self.levels_scale == 'log10':
+            levels = np.logspace(-1, np.log10(self.vmax), n_levels + 1, base=10)
+        else:
+            return
 
     def plot(self, x, y, colors=None, linestyles=None, labels=None):
         assert x.ndim == 1, ''
@@ -138,23 +181,129 @@ class MyFigure(Figure):
         else:
             labels = [None for i in range(n_lines)]
 
-        # axes of the figure
-        ax = self.axes[0]
-
         # plot lines
         for i in range(n_lines):
             if self.plot_type == 'linear':
-                ax.plot(x, y[i], color=colors[i], linestyle=linestyles[i], label=labels[i])
+                self.ax.plot(x, y[i], color=colors[i],
+                             linestyle=linestyles[i], label=labels[i])
             elif self.plot_type == 'semilogx':
-                ax.semilogx(x, y[i], color=colors[i], linestyle=linestyles[i], label=labels[i])
+                self.ax.semilogx(x, y[i], color=colors[i],
+                                 linestyle=linestyles[i], label=labels[i])
             elif self.plot_type == 'semilogy':
-                ax.semilogy(x, y[i], color=colors[i], linestyle=linestyles[i], label=labels[i])
+                self.ax.semilogy(x, y[i], color=colors[i],
+                                 linestyle=linestyles[i], label=labels[i])
             elif self.plot_type == 'loglog':
-                ax.loglog(x, y[i], color=colors[i], linestyle=linestyles[i], label=labels[i])
+                self.ax.loglog(x, y[i], color=colors[i],
+                               linestyle=linestyles[i], label=labels[i])
 
         # legend
         if any(label is not None for label in labels):
-            ax.legend(loc=self.legend_loc, fontsize=8)
+            self.ax.legend(loc=self.legend_loc, fontsize=8)
+
+        # save figure
+        if self.file_path is not None:
+            self.savefig(self.file_path)
+
+    def reduce_arrays_xy_axis(self, X, Y, Z=None, U=None, V=None):
+        '''
+        '''
+        # check if height Z or vector field U, V is given 
+        if Z is None:
+            assert U is not None and V is not None, ''
+        else:
+            assert U is None and V is None, ''
+
+        # if xlim is given
+        if self.xlim_changed:
+
+            # get x axis
+            x = X[:, 0]
+
+            # get x bounds
+            xmin, xmax = self.ax.get_xbound()
+
+            # get indices of the given limits
+            idx_xmin = np.argmin(np.abs(x - xmin))
+            idx_xmax = np.argmin(np.abs(x - xmax))
+            idx_x = slice(idx_xmin, idx_xmax + 1)
+
+        else:
+            idx_x = slice(None)
+
+        # if ylim is given
+        if self.ylim_changed:
+
+            # get y axis
+            y = Y[0, :]
+
+            # get y bounds
+            ymin, ymax = self.ax.get_ybound()
+
+            # get indices of the given limits
+            idx_ymin = np.argmin(np.abs(y - ymin))
+            idx_ymax = np.argmin(np.abs(y - ymax))
+            idx_y = slice(idx_ymin, idx_ymax + 1)
+
+        else:
+            idx_y = slice(None)
+
+        # reduce coordinates
+        X = X[idx_x, idx_y]
+        Y = Y[idx_x, idx_y]
+
+        # reduce height
+        if Z is not None:
+            Z = Z[idx_x, idx_y]
+            return X, Y, Z
+
+        # reduce U and V
+        if U is not None and V is not None:
+            U = U[idx_x, idx_y]
+            V = V[idx_x, idx_y]
+            return X, Y, U, V
+
+    def contour(self, X, Y, Z, vmin=None, vmax=None, levels=None):
+        '''
+        '''
+        assert X.ndim == Y.ndim == Z.ndim == 2, ''
+        assert Z.shape == X.shape == Y.shape, ''
+
+        # reduce arrays according to the x and y limits if changed
+        if self.xlim_changed or self.ylim_changed:
+            X, Y, Z = self.reduce_arrays_xy_axis(X, Y, Z=Z)
+
+        # set colormap if is not set yet
+        if self.colormap is None:
+            self.set_colormap('coolwarm')
+
+        # get minimum and maximum height values
+        if vmin is not None:
+            self.vmin = vmin
+        else:
+            self.vmin = Z.min()
+        if vmax is not None:
+            self.max = vmax
+        else:
+            self.vmax = Z.max()
+
+        # get levels
+        levels = self.get_contour_levels()
+
+        # contour f
+        cs = self.ax.contourf(
+            X,
+            Y,
+            Z,
+            vmin=self.vmin,
+            vmax=self.vmax,
+            levels=levels,
+            cmap=self.colormap,
+            extend='both',
+            #norm=colors.LogNorm(self.zmin, self.zmax),
+        )
+
+        # colorbar
+        cbar = self.colorbar(cs)
 
         # save figure
         if self.file_path is not None:
