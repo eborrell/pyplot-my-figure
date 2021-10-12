@@ -115,7 +115,6 @@ class MyFigure(Figure):
         assert plot_scale in PLOT_SCALES, ''
         self.plot_scale = plot_scale
 
-
     def plot(self, x, y, colors=None, linestyles=None, labels=None):
         assert x.ndim == 1, ''
         assert y.ndim in [1, 2], ''
@@ -309,3 +308,64 @@ class MyFigure(Figure):
         if self.file_path is not None:
             self.savefig(self.file_path)
 
+    def coarse_quiver_arrows(self, X, Y, U, V, kx, ky):
+        # show every kx row and ky column
+        X = X[::kx, ::ky]
+        Y = Y[::kx, ::ky]
+        U = U[::kx, ::ky]
+        V = V[::kx, ::ky]
+        return X, Y, U, V
+
+    def vector_field(self, X, Y, U, V, kx=None, ky=None, scale=None, width=0.005):
+        '''
+        '''
+        assert X.ndim == Y.ndim == U.ndim == V.ndim == 2, ''
+        assert X.shape == Y.shape == U.shape == V.shape, ''
+
+        # reduce arrays according to the x and y limits if changed
+        if self.xlim_changed or self.ylim_changed:
+            X, Y, U, V = self.reduce_arrays_xy_axis(X, Y, U=U, V=V)
+
+        # coarse arrays
+        l = 25
+        if kx is None and X.shape[0] >= l:
+            kx = X.shape[0] // 25
+        elif kx is None and X.shape[0] < l:
+            kx = 1
+
+        if ky is None and Y.shape[1] >= l:
+            ky = Y.shape[1] // 25
+        elif ky is None and Y.shape[1] < l:
+            ky = 1
+
+        X, Y, U, V = self.coarse_quiver_arrows(X, Y, U, V, kx, ky)
+
+        # set colormap if is not set yet
+        if self.colormap is None:
+            self.set_colormap('viridis_r', 0.20, 0.95, 75)
+
+        # initialize norm object and make rgba array
+        C = np.sqrt(U**2 + V**2)
+        norm = colors.Normalize(vmin=np.min(C), vmax=np.max(C))
+        sm = cm.ScalarMappable(cmap=self.colormap, norm=norm)
+
+        # quiver
+        quiv = self.ax.quiver(
+            X,
+            Y,
+            U,
+            V,
+            C,
+            cmap=self.colormap,
+            angles='xy',
+            scale_units='xy',
+            scale=scale,
+            width=width,
+        )
+
+        # colorbar
+        self.colorbar(sm)
+
+        # save figure
+        if self.file_path is not None:
+            self.savefig(self.file_path)
