@@ -1,12 +1,10 @@
 from matplotlib.figure import Figure
 from matplotlib import colors, cm, rc
-#from matplotlib import ticker, cm, colors
 import numpy as np
 
 import os
 
-#TODO: change name
-PLOT_TYPES = [
+PLOT_SCALES = [
     'linear',
     'semilogx',
     'semilogy',
@@ -27,7 +25,7 @@ LEGEND_LOCATION_STRINGS = [
     'center',
 ]
 
-LEVELS_SCALE = [
+LEVELS_SCALES = [
     'lineal',
     'log2',
     'log',
@@ -50,7 +48,7 @@ class MyFigure(Figure):
         self.ax = self.subplots()
 
         # default plot type
-        self.plot_type = 'linear'
+        self.plot_scale = 'linear'
 
         # legend
         self.legend_loc = 'upper right'
@@ -113,32 +111,10 @@ class MyFigure(Figure):
 
         self.legend_loc = loc
 
-    def set_plot_type(self, plot_type):
-        assert plot_type in PLOT_TYPES, ''
-        self.plot_type = plot_type
+    def set_plot_scale(self, plot_scale):
+        assert plot_scale in PLOT_SCALES, ''
+        self.plot_scale = plot_scale
 
-    def set_colormap(self, colormap, start=0, stop=1, num=100):
-        assert 0 <= start <= stop <= 1, ''
-        colormap = cm.get_cmap(colormap, 100)
-        self.colormap = colors.ListedColormap(
-            colormap(np.linspace(start, stop, num))
-        )
-
-    def set_contour_levels_scale(self, scale='lineal'):
-        assert scale in LEVELS_SCALE, ''
-        self.levels_scale = scale
-
-    def get_contour_levels(self, n_levels=10):
-        if self.levels_scale == 'lineal':
-            levels = np.linspace(0, self.vmax, n_levels + 1)
-        elif self.levels_scale == 'log2':
-            levels = np.logspace(-1, np.log2(self.vmax), n_levels + 1, base=2)
-        elif self.levels_scale == 'log':
-            levels = np.logspace(-1, np.log(self.vmax), n_levels + 1, base=np.e)
-        elif self.levels_scale == 'log10':
-            levels = np.logspace(-1, np.log10(self.vmax), n_levels + 1, base=10)
-        else:
-            return
 
     def plot(self, x, y, colors=None, linestyles=None, labels=None):
         assert x.ndim == 1, ''
@@ -183,16 +159,16 @@ class MyFigure(Figure):
 
         # plot lines
         for i in range(n_lines):
-            if self.plot_type == 'linear':
+            if self.plot_scale == 'linear':
                 self.ax.plot(x, y[i], color=colors[i],
                              linestyle=linestyles[i], label=labels[i])
-            elif self.plot_type == 'semilogx':
+            elif self.plot_scale == 'semilogx':
                 self.ax.semilogx(x, y[i], color=colors[i],
                                  linestyle=linestyles[i], label=labels[i])
-            elif self.plot_type == 'semilogy':
+            elif self.plot_scale == 'semilogy':
                 self.ax.semilogy(x, y[i], color=colors[i],
                                  linestyle=linestyles[i], label=labels[i])
-            elif self.plot_type == 'loglog':
+            elif self.plot_scale == 'loglog':
                 self.ax.loglog(x, y[i], color=colors[i],
                                linestyle=linestyles[i], label=labels[i])
 
@@ -203,6 +179,29 @@ class MyFigure(Figure):
         # save figure
         if self.file_path is not None:
             self.savefig(self.file_path)
+
+    def set_colormap(self, colormap, start=0, stop=1, num=100):
+        assert 0 <= start <= stop <= 1, ''
+        colormap = cm.get_cmap(colormap, 100)
+        self.colormap = colors.ListedColormap(
+            colormap(np.linspace(start, stop, num))
+        )
+
+    def set_contour_levels_scale(self, scale='lineal'):
+        assert scale in LEVELS_SCALES, ''
+        self.levels_scale = scale
+
+    def get_contour_levels(self, n_levels=10):
+        if self.levels_scale == 'lineal':
+            levels = np.linspace(0, self.vmax, n_levels + 1)
+        elif self.levels_scale == 'log2':
+            levels = np.logspace(-1, np.log2(self.vmax), n_levels + 1, base=2)
+        elif self.levels_scale == 'log':
+            levels = np.logspace(-1, np.log(self.vmax), n_levels + 1, base=np.e)
+        elif self.levels_scale == 'log10':
+            levels = np.logspace(-1, np.log10(self.vmax), n_levels + 1, base=10)
+        else:
+            return
 
     def reduce_arrays_xy_axis(self, X, Y, Z=None, U=None, V=None):
         '''
@@ -301,6 +300,7 @@ class MyFigure(Figure):
             extend='both',
             #norm=colors.LogNorm(self.zmin, self.zmax),
         )
+        #TODO! test LogNorm possibility
 
         # colorbar
         cbar = self.colorbar(cs)

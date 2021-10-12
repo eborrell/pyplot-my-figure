@@ -82,7 +82,7 @@ class TestPlot:
             dir_path=dir_path,
             file_name='one_line_scales',
         )
-        fig.set_plot_type('loglog')
+        fig.set_plot_scale('loglog')
         fig.plot(x, f)
 
     def test_plot_multiple_lines(self, dir_path, x, f, g):
@@ -119,5 +119,5 @@ class TestPlot:
             file_name='multiple_lines_scales',
         )
         y = np.vstack((f, g))
-        fig.set_plot_type('loglog')
+        fig.set_plot_scale('loglog')
         fig.plot(x, y)
