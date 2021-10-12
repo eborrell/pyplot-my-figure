@@ -71,4 +71,5 @@ class TestContour:
             file_name='contour_levels',
         )
         X, Y = mesh
+        fig.set_contour_levels_scale('log')
         fig.contour(X, Y, f)

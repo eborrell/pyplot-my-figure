@@ -63,6 +63,9 @@ class MyFigure(Figure):
         self.xlim_changed = False
         self.ylim_changed = False
 
+        # fig size
+        self.figsize = (8, 6)
+
 
     @property
     def file_path(self):
@@ -200,7 +203,8 @@ class MyFigure(Figure):
         elif self.levels_scale == 'log10':
             levels = np.logspace(-1, np.log10(self.vmax), n_levels + 1, base=10)
         else:
-            return
+            levels = None
+        return levels
 
     def reduce_arrays_xy_axis(self, X, Y, Z=None, U=None, V=None):
         '''
