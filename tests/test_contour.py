@@ -1,14 +1,10 @@
 from figures.myfigure import MyFigure
+from figures.utils import get_data_dir
 import matplotlib.pyplot as plt
 
 import numpy as np
-from pathlib import Path
 import os
 import pytest
-
-SOURCE_PATH = Path(os.path.dirname(__file__))
-PROJECT_PATH = SOURCE_PATH.parent
-DATA_PATH = os.path.join(PROJECT_PATH, 'data')
 
 class TestContour:
     '''
@@ -17,7 +13,7 @@ class TestContour:
     def dir_path(self):
         ''' returns dir path for the test plots
         '''
-        dir_path = os.path.join(DATA_PATH, 'tests')
+        dir_path = os.path.join(get_data_dir(), 'contour')
         return dir_path
 
     @pytest.fixture

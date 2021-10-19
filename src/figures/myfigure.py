@@ -67,6 +67,7 @@ class MyFigure(Figure):
         self.figsize = (8, 6)
 
 
+
     @property
     def file_path(self):
         if self.dir_path is not None:
