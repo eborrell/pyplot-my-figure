@@ -1,12 +1,8 @@
 from figures.myfigure import MyFigure
+from figures.utils import get_data_dir
 
 import os
-from pathlib import Path
 import pytest
-
-SOURCE_PATH = Path(os.path.dirname(__file__))
-PROJECT_PATH = SOURCE_PATH.parent
-DATA_PATH = os.path.join(PROJECT_PATH, 'data')
 
 class TestPropertyFilePath:
     '''
@@ -16,7 +12,7 @@ class TestPropertyFilePath:
     def test_property_file_path(self):
 
         # initialize custom figure
-        dir_path = os.path.join(DATA_PATH, 'tests')
+        dir_path = os.path.join(get_data_dir(), 'foo')
         file_name = 'figure_1'
         file_type = 'png'
         fig = MyFigure(dir_path, file_name, file_type)
