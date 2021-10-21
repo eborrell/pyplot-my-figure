@@ -37,6 +37,11 @@ class MyFigure(Figure):
     '''
 
     def __init__(self, dir_path=None, file_name='foo', file_type='png', *args, **kwargs):
+
+        # set figure size
+        if kwargs['figsize'] is None:
+            kwargs['figsize'] = (8, 6)
+
         super().__init__(*args, **kwargs)
 
         # file path attributes
@@ -62,10 +67,6 @@ class MyFigure(Figure):
         # x and y lim changed flag
         self.xlim_changed = False
         self.ylim_changed = False
-
-        # fig size
-        self.figsize = (8, 6)
-
 
 
     @property
