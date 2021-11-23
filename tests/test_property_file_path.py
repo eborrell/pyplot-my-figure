@@ -1,6 +1,7 @@
 from figures.myfigure import MyFigure
 from figures.utils import get_data_dir
 
+import matplotlib.pyplot as plt
 import os
 import pytest
 
@@ -15,7 +16,13 @@ class TestPropertyFilePath:
         dir_path = os.path.join(get_data_dir(), 'foo')
         file_name = 'figure_1'
         file_type = 'png'
-        fig = MyFigure(dir_path, file_name, file_type)
+        fig = plt.figure(
+            FigureClass=MyFigure,
+            dir_path=dir_path,
+            file_name=file_name,
+            file_type=file_type,
+        )
+
         assert fig.file_path is not None
         assert fig.file_path == os.path.join(dir_path, file_name + '.' + file_type)
 

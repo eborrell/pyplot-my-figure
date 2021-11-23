@@ -55,9 +55,6 @@ class MyFigure(Figure):
         # default plot type
         self.plot_scale = 'linear'
 
-        # legend
-        self.legend_loc = 'upper right'
-
         # colormap
         self.colormap = None
 
@@ -67,6 +64,39 @@ class MyFigure(Figure):
         # x and y lim changed flag
         self.xlim_changed = False
         self.ylim_changed = False
+
+        # set font parameters
+        # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html
+        font = {
+            'family': 'serif',
+            'weight': 'normal',
+            'size': 15,
+        }
+        rc('font', **font)
+
+        # set lines parameters
+        lines = {
+            'linewidth': 3.,
+        }
+        rc('lines', **lines)
+
+        # set axes parameters
+        axes = {
+            'titlesize': 22,
+            'titleweight': 'normal',
+            'labelsize': 18,
+            'labelweight': 'normal',
+        }
+        rc('axes', **axes)
+
+        # set legent parameters
+        legend = {
+            'fontsize': 15,
+            'loc': 'upper right',
+        }
+        rc('legend', **legend)
+        self.legend_loc = legend['loc']
+
 
 
     @property
@@ -120,7 +150,7 @@ class MyFigure(Figure):
         assert plot_scale in PLOT_SCALES, ''
         self.plot_scale = plot_scale
 
-    def plot(self, x, y, colors=None, linestyles=None, labels=None):
+    def plot(self, x, y,  labels=None, colors=None, linestyles=None, markers=None):
         assert x.ndim == 1, ''
         assert y.ndim in [1, 2], ''
 
@@ -133,6 +163,15 @@ class MyFigure(Figure):
 
         # number of lines to plot
         n_lines = y.shape[0]
+
+        # labels
+        if labels is not None and type(labels) == str:
+            assert n_lines == 1, ''
+            labels = [labels]
+        elif labels is not None and type(labels) == list:
+            assert n_lines == len(labels), ''
+        else:
+            labels = [None for i in range(n_lines)]
 
         # colors
         if colors is not None and type(colors) == str:
@@ -152,33 +191,55 @@ class MyFigure(Figure):
         else:
             linestyles = ['-' for i in range(n_lines)]
 
-        # labels
-        if labels is not None and type(labels) == str:
+        # markers
+        if markers is not None and type(markers) == str:
             assert n_lines == 1, ''
-            labels = [labels]
-        elif labels is not None and type(labels) == list:
-            assert n_lines == len(labels), ''
+            markers = [markers]
+        elif markers is not None and type(markers) == list:
+            assert n_lines == len(markers), ''
         else:
-            labels = [None for i in range(n_lines)]
+            markers = [None for i in range(n_lines)]
 
         # plot lines
         for i in range(n_lines):
             if self.plot_scale == 'linear':
-                self.ax.plot(x, y[i], color=colors[i],
-                             linestyle=linestyles[i], label=labels[i])
+                self.ax.plot(x, y[i], color=colors[i], linestyle=linestyles[i],
+                             label=labels[i], marker=markers[i])
             elif self.plot_scale == 'semilogx':
-                self.ax.semilogx(x, y[i], color=colors[i],
-                                 linestyle=linestyles[i], label=labels[i])
+                self.ax.semilogx(x, y[i], color=colors[i], linestyle=linestyles[i],
+                                 label=labels[i], marker=markers[i])
             elif self.plot_scale == 'semilogy':
-                self.ax.semilogy(x, y[i], color=colors[i],
-                                 linestyle=linestyles[i], label=labels[i])
+                self.ax.semilogy(x, y[i], color=colors[i], linestyle=linestyles[i],
+                                 label=labels[i], marker=markers[i])
             elif self.plot_scale == 'loglog':
-                self.ax.loglog(x, y[i], color=colors[i],
-                               linestyle=linestyles[i], label=labels[i])
+                self.ax.loglog(x, y[i], color=colors[i], linestyle=linestyles[i],
+                               label=labels[i], marker=markers[i])
 
         # legend
         if any(label is not None for label in labels):
-            self.ax.legend(loc=self.legend_loc, fontsize=8)
+            self.ax.legend(loc=self.legend_loc)
+
+        # set ylim if xlim has been changed
+        if self.xlim_changed and not self.ylim_changed:
+
+            # get x bounds
+            xmin, xmax = self.ax.get_xbound()
+
+            # get indices of the interval [xmin, xmax]
+            idx_xmin = np.argmin(np.abs(x - xmin))
+            idx_xmax = np.argmin(np.abs(x - xmax))
+            idx_x = slice(idx_xmin, idx_xmax + 1)
+
+            ymin = ymax = 0
+
+            # get max and min of y_i in the interval
+            for i in range(n_lines):
+                if ymin > np.min(y[i][idx_x]):
+                    ymin = np.min(y[i][idx_x])
+                if ymax < np.max(y[i][idx_x]):
+                    ymax = np.max(y[i][idx_x])
+
+            self.set_ylim(ymin, ymax)
 
         # save figure
         if self.file_path is not None:
