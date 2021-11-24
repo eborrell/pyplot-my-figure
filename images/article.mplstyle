@@ -1,0 +1,20 @@
+axes.titlesize : 22
+axes.titleweight : normal
+axes.labelsize : 18
+axes.labelweight : normal
+axes.titlepad: 20
+
+font.family: serif
+font.weight: normal
+font.size: 15
+
+legend.fontsize: 15
+legend.loc: upper right
+
+lines.linewidth : 3
+lines.markersize : 10
+
+xtick.labelsize : 16
+ytick.labelsize : 16
+xtick.major.size: 10
+ytick.major.size: 10

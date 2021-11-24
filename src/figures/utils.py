@@ -12,3 +12,9 @@ def get_data_dir():
     '''
     project_path = get_project_dir()
     return os.path.join(project_path, 'data')
+
+def get_images_dir():
+    ''' returns the absolute path of the repository's images directory
+    '''
+    project_path = get_project_dir()
+    return os.path.join(project_path, 'images')

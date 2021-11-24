@@ -1,5 +1,7 @@
+from figures.utils import get_images_dir
+
 from matplotlib.figure import Figure
-from matplotlib import colors, cm, rc
+from matplotlib import pyplot as plt, colors, cm, rc, rcParams
 import numpy as np
 
 import os
@@ -52,6 +54,16 @@ class MyFigure(Figure):
         # add set of subplots
         self.ax = self.subplots()
 
+        # import rcParams by importing style sheet
+        style_sheet_path = os.path.join(
+            get_images_dir(),
+            'article.mplstyle'
+        )
+        plt.style.use(style_sheet_path)
+
+        # get legend default location 
+        self.legend_loc = rcParams['legend.loc']
+
         # default plot type
         self.plot_scale = 'linear'
 
@@ -64,39 +76,6 @@ class MyFigure(Figure):
         # x and y lim changed flag
         self.xlim_changed = False
         self.ylim_changed = False
-
-        # set font parameters
-        # https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.text.html
-        font = {
-            'family': 'serif',
-            'weight': 'normal',
-            'size': 15,
-        }
-        rc('font', **font)
-
-        # set lines parameters
-        lines = {
-            'linewidth': 3.,
-        }
-        rc('lines', **lines)
-
-        # set axes parameters
-        axes = {
-            'titlesize': 22,
-            'titleweight': 'normal',
-            'labelsize': 18,
-            'labelweight': 'normal',
-        }
-        rc('axes', **axes)
-
-        # set legent parameters
-        legend = {
-            'fontsize': 15,
-            'loc': 'upper right',
-        }
-        rc('legend', **legend)
-        self.legend_loc = legend['loc']
-
 
 
     @property
