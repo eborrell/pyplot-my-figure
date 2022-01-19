@@ -240,7 +240,7 @@ class MyFigure(Figure):
 
     def get_contour_levels(self, n_levels=10):
         if self.levels_scale == 'linear':
-            levels = np.linspace(0, self.vmax, n_levels + 1)
+            levels = np.linspace(self.vmin, self.vmax, n_levels + 1)
         elif self.levels_scale == 'log2':
             levels = np.logspace(-1, np.log2(self.vmax), n_levels + 1, base=2)
         elif self.levels_scale == 'log':
