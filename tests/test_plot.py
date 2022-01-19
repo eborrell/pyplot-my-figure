@@ -136,7 +136,10 @@ class TestPlot:
         )
 
         y = np.vstack((f, g))
-        labels = [r'$f(x) = x^2$', r'$f(x) = x^3$']
+        labels = [
+            r'$f(x) = x^2$',
+            r'$f(x) = x^3$',
+        ]
         fig.set_legend_location('upper right')
         fig.plot(x, y, labels=labels)
 

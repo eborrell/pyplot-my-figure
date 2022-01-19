@@ -28,7 +28,7 @@ LEGEND_LOCATION_STRINGS = [
 ]
 
 LEVELS_SCALES = [
-    'lineal',
+    'linear',
     'log2',
     'log',
     'log10',
@@ -63,6 +63,7 @@ class MyFigure(Figure):
 
         # get legend default location 
         self.legend_loc = rcParams['legend.loc']
+        self.show_legend = True
 
         # default plot type
         self.plot_scale = 'linear'
@@ -71,7 +72,7 @@ class MyFigure(Figure):
         self.colormap = None
 
         # levels scale
-        self.levels_scale = 'lineal'
+        self.levels_scale = 'linear'
 
         # x and y lim changed flag
         self.xlim_changed = False
@@ -122,8 +123,10 @@ class MyFigure(Figure):
 
     def set_legend_location(self, loc):
         assert loc in LEGEND_LOCATION_STRINGS, ''
-
         self.legend_loc = loc
+
+    def turn_legend_off(self):
+        self.show_legend = False
 
     def set_plot_scale(self, plot_scale):
         assert plot_scale in PLOT_SCALES, ''
@@ -195,7 +198,7 @@ class MyFigure(Figure):
                                label=labels[i], marker=markers[i])
 
         # legend
-        if any(label is not None for label in labels):
+        if self.show_legend and any(label is not None for label in labels):
             self.ax.legend(loc=self.legend_loc)
 
         # set ylim if xlim has been changed
@@ -231,12 +234,12 @@ class MyFigure(Figure):
             colormap(np.linspace(start, stop, num))
         )
 
-    def set_contour_levels_scale(self, scale='lineal'):
+    def set_contour_levels_scale(self, scale='linear'):
         assert scale in LEVELS_SCALES, ''
         self.levels_scale = scale
 
     def get_contour_levels(self, n_levels=10):
-        if self.levels_scale == 'lineal':
+        if self.levels_scale == 'linear':
             levels = np.linspace(0, self.vmax, n_levels + 1)
         elif self.levels_scale == 'log2':
             levels = np.logspace(-1, np.log2(self.vmax), n_levels + 1, base=2)
@@ -246,6 +249,10 @@ class MyFigure(Figure):
             levels = np.logspace(-1, np.log10(self.vmax), n_levels + 1, base=10)
         else:
             levels = None
+
+        # round levels to 1 decimal
+        levels = np.around(levels, 1)
+
         return levels
 
     def reduce_arrays_xy_axis(self, X, Y, Z=None, U=None, V=None):
