@@ -71,8 +71,9 @@ class MyFigure(Figure):
         # colormap
         self.colormap = None
 
-        # levels scale
+        # levels
         self.levels_scale = 'linear'
+        self.levels_decimals = None
 
         # x and y lim changed flag
         self.xlim_changed = False
@@ -234,9 +235,13 @@ class MyFigure(Figure):
             colormap(np.linspace(start, stop, num))
         )
 
-    def set_contour_levels_scale(self, scale='linear'):
+    def set_contour_levels_scale(self, scale):
         assert scale in LEVELS_SCALES, ''
         self.levels_scale = scale
+
+    def set_contour_levels_decimals(self, decimals):
+        assert type(decimals) == int, ''
+        self.levels_decimals = decimals
 
     def get_contour_levels(self, n_levels=10):
         if self.levels_scale == 'linear':
@@ -251,7 +256,8 @@ class MyFigure(Figure):
             levels = None
 
         # round levels to 1 decimal
-        levels = np.around(levels, 1)
+        if self.levels_decimals is not None:
+            levels = np.around(levels, self.levels_decimals)
 
         return levels
 
