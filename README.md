@@ -5,7 +5,7 @@ Custom figure subclass to pyplot figure
 
 1) clone the repo
 ```
-git clone git@github.com:eborrell/mds.git
+git clone git@github.com:riberaborrell/pyplot-my-figure.git
 ```
 
 2) set python version
